@@ -185,7 +185,7 @@ class hw_01(IrisDataset):
 
 
 def main():
-    path = "/home/mukta/BDA602ML/hw_01/Dataset/iris.data"
+    path = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/"
     hw01 = hw_01(iris_dataset=path)
     df = hw01.load()
     hw01.statisticSummary(df)
