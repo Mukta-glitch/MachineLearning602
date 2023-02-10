@@ -117,7 +117,15 @@ class hw_01(IrisDataset):
             title="Histogram for Iris dataset")
         fig4.write_html(file="Histogram.html", include_plotlyjs="cdn")
         fig4.show()
-
+        
+        fig5 = plt.line(
+            data,
+            x=data['sepal length (cm)'],
+            y=data['petal length (cm)'],
+            color=data['class'],
+            title="Line Graph for Iris dataset")
+        fig5.write_html(file="Line.html", include_plotlyjs="cdn")
+        fig5.show()
     # Different Models for classification.
 
     def classificationModels(self, data):
