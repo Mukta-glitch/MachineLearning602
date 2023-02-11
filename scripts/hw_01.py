@@ -1,10 +1,11 @@
 #!/usr/bin/python3
-
+# pylint: disable=consider-using-f-string
 """References=
 1.https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
 2.https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html
 3.https://plotly.com/python/figure-labels/
-4.https://stackoverflow.com/questions/57977245/python-how-do-i-create-a-new-variable-which-is-a-boolean-indicator-of-another-v"""
+4.https://stackoverflow.com"""
+
 
 import sys
 import pandas as pd
@@ -12,28 +13,25 @@ import numpy as np
 import sklearn as sk
 from sklearn import tree, metrics
 from sklearn.metrics import accuracy_score, classification_report
-import random
-from scipy import stats
-import plotly.express as plt
 from sklearn.preprocessing import StandardScaler
-import plotly.figure_factory as plt2
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
 from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
-
+import plotly.express as plt
 
 class IrisDataset:
+    """Initialize Dataset"""
     def __init__(self, iris_dataset: str):
         self.iris_dataset = iris_dataset
         return
 
 
-class hw_01(IrisDataset):
-
-    # Load the iris data.
+class HomeWork(IrisDataset):
+    """Load the iris data."""
     def load(self):
+        """load"""
         return pd.read_csv(
             self.iris_dataset,
             names=[
@@ -44,19 +42,21 @@ class hw_01(IrisDataset):
                 'class'])
 
     # To perform statistical analysis.
-    def npStats(self, data, col):
-        min = np.min(data[col])
-        max = np.max(data[col])
+    def np_stats(self, data, col):
+        """Stat Analysis"""
+        minimum = np.min(data[col])
+        maximum = np.max(data[col])
         mean = round(np.mean(data[col]), 2)
         std = round(np.std(data[col]), 2)
-        q1 = np.quantile(data[col], 0.25)
-        q2 = np.quantile(data[col], 0.5)
-        q3 = np.quantile(data[col], 0.75)
-        q4 = np.quantile(data[col], 0.1)
-        return min, max, mean, std, q1, q2, q3, q4
+        q_1 = np.quantile(data[col], 0.25)
+        q_2 = np.quantile(data[col], 0.5)
+        q_3 = np.quantile(data[col], 0.75)
+        q_4 = np.quantile(data[col], 0.1)
+        return minimum, maximum, mean, std, q_1, q_2, q_3, q_4
 
     # To calculate and print the statistic summary in tabluar format.
-    def statisticSummary(self, data):
+    def statistic_summary(self, data):
+        """Stat Summary"""
         print("Summary Statistics: \n")
         print(
             "{:<20} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8}". format(
@@ -65,26 +65,27 @@ class hw_01(IrisDataset):
                 "Max",
                 "Mean",
                 "SD",
-                "Q1(25%)",
-                "Q2(50%)",
-                "Q3(75%)",
-                "Q4(100%)"))
+                "q_1(25%)",
+                "q_2(50%)",
+                "q_3(75%)",
+                "q_4(100%)"))
         for i in data.iloc[:, :-1]:
-            min, max, mean, std, q1, q2, q3, q4 = self.npStats(data, i)
+            minimum, maximum, mean, std, q_1, q_2, q_3, q_4 = self.np_stats(data, i)
             print(
                 "{:<20} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8} {:<8}". format(
                     i,
-                    min,
-                    max,
+                    minimum,
+                    maximum,
                     mean,
                     std,
-                    q1,
-                    q2,
-                    q3,
-                    q4))
+                    q_1,
+                    q_2,
+                    q_3,
+                    q_4))
 
   # Plotting graphs according to different classes.
-    def plotGraphs(self, data):
+    def plot_graphs(self, data):
+        """Plot Graphs"""
         fig = plt.scatter(
             data,
             x=data['sepal length (cm)'],
@@ -117,7 +118,6 @@ class hw_01(IrisDataset):
             title="Histogram for Iris dataset")
         fig4.write_html(file="Histogram.html", include_plotlyjs="cdn")
         fig4.show()
-        
         fig5 = plt.line(
             data,
             x=data['sepal length (cm)'],
@@ -128,21 +128,23 @@ class hw_01(IrisDataset):
         fig5.show()
     # Different Models for classification.
 
-    def classificationModels(self, data):
-        le = sk.preprocessing.LabelEncoder()
-        data['class'] = le.fit_transform(data['class'])
-        X = data.iloc[:, :-1]
-        y = data['class']
-        print(X, y)
+
+    def classification_models(self, data):
+        """Classify models"""
+        l_classify = sk.preprocessing.LabelEncoder()
+        data['class'] = l_classify.fit_transform(data['class'])
+        x_data= data.iloc[:, :-1]
+        y_data = data['class']
+        print(x_data, y_data)
         scaler = StandardScaler()
-        X = scaler.fit_transform(X)
-        print(X, y)
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, random_state=50, test_size=0.35)
+        x_data = scaler.fit_transform(x_data)
+        print(x_data, y_data)
+        x_train, x_test, y_train, y_test = train_test_split(
+            x_data, y_data, random_state=50, test_size=0.35)
         print("Decision Tree Classifier")
         clf = tree.DecisionTreeClassifier(max_depth=5)
-        clf.fit(X_train, y_train)
-        predict = clf.predict(X_test)
+        clf.fit(x_train, y_train)
+        predict = clf.predict(x_test)
         print(
             "Accuracy Score of depth {}: {}\t".format(
                 5, accuracy_score(
@@ -150,19 +152,19 @@ class hw_01(IrisDataset):
         print(classification_report(y_test, predict))
         pipe = Pipeline([('scaler', StandardScaler()),
                         ('Decision Tree', tree.DecisionTreeClassifier())])
-        print(pipe.fit(X_train, y_train))
-        print(pipe.score(X_test, y_test))
+        print(pipe.fit(x_train, y_train))
+        print(pipe.score(x_test, y_test))
 
         print("Random Forest Classifier")
         clf = RandomForestClassifier(n_estimators=5)
-        clf.fit(X_train, y_train)
-        predictRandom = clf.predict(X_test)
-        print("Accuracy:", metrics.accuracy_score(y_test, predictRandom))
-        print(classification_report(y_test, predictRandom))
+        clf.fit(x_train, y_train)
+        predict_random = clf.predict(x_test)
+        print("Accuracy:", metrics.accuracy_score(y_test, predict_random))
+        print(classification_report(y_test, predict_random))
         pipe = Pipeline([('scaler', StandardScaler()),
                         ('Random Forest', RandomForestClassifier())])
-        print(pipe.fit(X_train, y_train))
-        print(pipe.score(X_test, y_test))
+        print(pipe.fit(x_train, y_train))
+        print(pipe.score(x_test, y_test))
         data['IsAboveMean'] = data['sepal length (cm)'] > data['sepal length (cm)'].mean(
         )
         fig = plt.histogram(
@@ -175,23 +177,24 @@ class hw_01(IrisDataset):
 
         print("SVM-Linear")
         clf = svm.SVC(kernel='linear')
-        clf.fit(X_train, y_train)
-        prediction = clf.predict(X_test)
+        clf.fit(x_train, y_train)
+        prediction = clf.predict(x_test)
         print("Accuracy:", metrics.accuracy_score(y_test, prediction))
         print(classification_report(y_test, prediction))
         pipe = Pipeline([('scaler', StandardScaler()), ('svc', SVC())])
-        print(pipe.fit(X_train, y_train))
-        print(pipe.score(X_test, y_test))
+        print(pipe.fit(x_train, y_train))
+        print(pipe.score(x_test, y_test))
 
 
 def main():
-    path = "/home/mukta/BDA602ML/hw_01/Dataset/iris.data"
-    hw01 = hw_01(iris_dataset=path)
-    df = hw01.load()
-    hw01.statisticSummary(df)
-    hw01.plotGraphs(df)
-    hw01.classificationModels(df)
-
+    """main"""
+    path = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+    hw01 = HomeWork(iris_dataset=path)
+    df_data = hw01.load()
+    hw01.statistic_summary(df_data)
+    hw01.plot_graphs(df_data)
+    hw01.classification_models(df_data)
+    #hw01.goPlot(df_data)
 
 if __name__ == "__main__":
     sys.exit(main())
