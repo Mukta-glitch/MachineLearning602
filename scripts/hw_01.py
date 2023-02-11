@@ -187,14 +187,13 @@ class HomeWork(IrisDataset):
 
 
 def main():
-    """main"""
     path = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
-    hw01 = HomeWork(iris_dataset=path)
-    df_data = hw01.load()
-    hw01.statistic_summary(df_data)
-    hw01.plot_graphs(df_data)
-    hw01.classification_models(df_data)
-    #hw01.goPlot(df_data)
+    hw01 = hw_01(iris_dataset=path)
+    df = hw01.load()
+    hw01.statisticSummary(df)
+    hw01.plotGraphs(df)
+    hw01.classificationModels(df)
+
 
 if __name__ == "__main__":
     sys.exit(main())
