@@ -1,5 +1,6 @@
 show databases;
 use baseball;
+--calculate batting_average
 create table battingaverage as 
 select 
   B.game_id, 
@@ -15,27 +16,37 @@ group by
 order by 
   B.batter, 
   DATE(B.updatedDate) desc;
-  
-SELECT batter,avg(Batting_average),YEAR(ud) AS Historic_batting_avg
-FROM battingaverage
-GROUP BY batter order by YEAR(ud);
 
-CREATE INDEX batterindex ON battingaverage(batter);
+--Index creation  
+create INDEX batterindex on battingaverage(batter);
 
+--Calculate Historic Batting Average
+Create table historic as
+select batter,avg(Batting_average),YEAR(ud) AS Historic_batting_avg
+from battingaverage
+group by batter order by YEAR(ud);
+
+--to refer column names and values
 select 
   * 
 from 
   battingaverage limit 10;
-  Create table rolling as 
-SELECT batter, ud, 
-       AVG(Batting_average) OVER (PARTITION BY batter ORDER BY ud) AS rolling_average
-FROM battingaverage
-WHERE batter = batter AND ud BETWEEN DATE_SUB(ud, INTERVAL 100 DAY) AND ud
-ORDER BY ud DESC;
+
+--rolling average
+Create table rolling as 
+Select batter, ud, 
+       AVG(Batting_average) OVER (PARTITION by batter order by ud) as rolling_average
+From battingaverage
+Where batter = batter and ud between DATE_SUB(ud, INTERVAL 100 DAY) and ud
+Order by batter,ud;
 
 select * from rolling;
+
+--drop tables created
 drop 
   table battingaverage;
+drop 
+  table historic;
 drop 
   table rolling;
 
