@@ -15,28 +15,28 @@ group by
 order by 
   B.batter, 
   DATE(B.updatedDate) desc;
-CREATE INDEX index_game_id ON battingaverage(batter);
+  
+SELECT batter,avg(Batting_average),YEAR(ud) AS Historic_batting_avg
+FROM battingaverage
+GROUP BY batter order by YEAR(ud);
+
+CREATE INDEX batterindex ON battingaverage(batter);
+
 select 
   * 
 from 
-  battingaverage;
-create table rolling as 
-select 
-  batter, 
-  avg(Batting_average) over (
-    Partition by batter, 
-    (
-      case when ud between DATE_SUB(ud, INTERVAL 100 DAY) 
-      and ud then Batting_average end
-    )
-  ) as batting_average
-from 
-  battingaverage order by batter;
-select 
-  * 
-from 
-  rolling;
+  battingaverage limit 10;
+  Create table rolling as 
+SELECT batter, ud, 
+       AVG(Batting_average) OVER (PARTITION BY batter ORDER BY ud) AS rolling_average
+FROM battingaverage
+WHERE batter = batter AND ud BETWEEN DATE_SUB(ud, INTERVAL 100 DAY) AND ud
+ORDER BY ud DESC;
+
+select * from rolling;
 drop 
   table battingaverage;
 drop 
   table rolling;
+
+
