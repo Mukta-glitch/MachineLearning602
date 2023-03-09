@@ -31,7 +31,7 @@ port = "3306"
 jdbc_url = f"jdbc:mysql://{server}:{port}/{database}?permitMysqlScheme"
 jdbc_driver = "org.mariadb.jdbc.Driver"
 
-# Create a data frame by reading data from Oracle via JDBC
+# Create a data frame by reading data from Mariadb via JDBC
 batting_df = spark.read.format("jdbc") \
     .option("url", jdbc_url) \
     .option("query", sql) \
