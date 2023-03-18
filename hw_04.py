@@ -1,16 +1,17 @@
 import sys
-import os
+
 import pandas as pd
 import numpy as np
+import statsmodels
 import statsmodels.api as sm
 from sklearn import datasets
 from statsmodels.formula.api import ols
 from scipy.stats import f
 import plotly.express as px
 from sklearn.utils.multiclass import type_of_target as tot
-import statsmodels
+import plotly.graph_objects as go
 
-def col_is_bool(df, col):
+def col_is_bool(df,col):
     c = len(df[col].unique())
     if c == 2:
         True
@@ -18,19 +19,12 @@ def col_is_bool(df, col):
         False
     return col
     
-def plot_predictor(df, predictor_col):
-    
-    if df[predictor_col].dtype == object:
-        # plot a histogram of the categorical variable
-        df[predictor_col].value_counts().plot(kind='bar')
-        print(f"{predictor_col} (Categorical)")
-        px.violin()
-    elif df[predictor_col].dtype in [int, float]:
-        # plot a histogram of the continuous variable
-        px.hist()
-        print(f"{predictor_col} (Continuous)")
+def plot_predictor(df,col):
+    if df[col]==object or df[col]==str:
+        True
     else:
-        print(f"Unknown data type for predictor column {predictor_col}")
+        False	
+    return col
 
 
 def Con_Con(predictor_df, response_series, weights=None):
@@ -174,8 +168,7 @@ def cat_response_cat_predictor(df, predictor_col, response_col):
         results = Cat_cat(df[predictor_col], df[response_col])
         for col, data in results.items():
             file_name = data["plot_mean"]
-            display(HTML(f"<h3>{col}</h3>"))
-            display(HTML(f'<iframe src="{file_name}" width="100%" height="500px"></iframe>'))
+            
     else:
         # Calculate ANOVA p-values for each predictor column
         p_values = []
@@ -205,12 +198,12 @@ def cat_response_cat_predictor(df, predictor_col, response_col):
             file=file_name,
             include_plotlyjs="cdn",
         )
-        display(HTML(f'<iframe src="{file_name}" width="100%" height="500px"></iframe>'))
         
 def main():
     dataset1 = datasets.load_iris()
     dataset2 = datasets.load_digits()
     dataset3 = datasets.load_diabetes()
+    dataset5=datasets.load_breast_cancer()
     dataset7 = datasets.load_wine()
 
     print("Choose the dataset you want :1.IRIS 2.DIGITS 3.DIABETES 4.BREAST CANCER")
@@ -229,40 +222,61 @@ def main():
         return
     
     df = pd.DataFrame(data=dataset.data, columns=dataset.feature_names)
-    df['target'] = pd.Series(dataset.target)
+    df['target'] = dataset.target
     df.head(5)
     
-    col_list = df.columns.values.tolist()
     print_heading("Dataset")
-    print(df)
+    print(dataset)
     
     print_heading("Response")
     response=dataset.target
     print(response)
-
+    
+    print_heading("Predictors")
+    predictors=[i for i in df.columns if i!=response]
+    print(predictors)
+    
+    Y=df[predictors]
+    
     # Perform ANOVA
     '''
     print_heading("ANOVA Results")
     anova_results = anova(df, 'target')
     print(anova_results)
-	
-    # Plot predictor variables
-    print_heading("Predictor Plots")
-    for col in col_list[:-1]:
-        plot_predictor(df, col_list)
-        
-    '''
-
-    # Perform linear regression
-    print_heading("Linear Regression Results")
-    predictors = df.iloc[:, :-1]
-    response = df.iloc[:, -1]
-    linear_regression(response, predictors, 'target')
+	'''
+    #Plot predictor variables
     
-    print_heading("Logistic Regression Results")
-    predictors = df.iloc[:, :-1]
-    response = df.iloc[:, -1]
-    logistic_regression(response, predictors, 'target')
+    for index, column in enumerate(predictors):
+        feature = df[column]
+        predictor = statsmodels.api.add_constant(feature)
+    predictors_type = []
+    response_type=col_is_bool(df,Y)
+    if predictors_type[index] is True and response_type is True:
+        cat_response_cat_predictor(predictor, column, Y)
+    #elif predictors_type[index] is False and response_type is True:
+        #cat_response_con_predictor(df, column, Y)
+	#elif predictors_type[index] is True and response_type is False:
+	#	con_response_cat_predictor(df, column, Y, response)
+	#else:
+	#	con_response_con_predictor(predictor, column, Y, response)
+	
+    if response_type==False:
+        print_heading("Linear Regression Results")
+        predictors = df.iloc[:, :-1]
+        response = df.iloc[:, -1]
+        linear_regression(response, predictors, 'target')
+        fig = px.scatter(x=feature, y=Y, trendline="ols")
+        fig.update_layout(
+				title=f"Variable: {column}: (t-value={t_val}) (p-value={p_val})",
+				xaxis_title=f"Variable:{column}",
+				yaxis_title=response,
+			)
+		
+    else: 
+        print_heading("Logistic Regression Results")
+        predictors = df.iloc[:, :-1]
+        response = df.iloc[:, -1]
+        logistic_regression(response, predictors, 'target')
     
 
     # Perform categorical to categorical comparison
@@ -289,3 +303,4 @@ def main():
         
 if __name__ == "__main__":
     sys.exit(main())
+
