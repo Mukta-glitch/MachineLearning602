@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+    db:
+        container_name: sql_server_db
+        build:
+            context: ./../
+            dockerfile: ./build/mssqlserver.Dockerfile
+        ports:
+            - '3306:3306'
