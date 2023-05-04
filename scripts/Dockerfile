@@ -8,7 +8,7 @@ ENV DB_NAME baseball
     
 
 # Copy SQL script to initialize database
-COPY ./joshi.sql /sql/joshi.sql
+COPY ./hw_02.sql /sql/hw_02.sql
 COPY ./baseball.sql ./sql/baseball.sql
 
 
