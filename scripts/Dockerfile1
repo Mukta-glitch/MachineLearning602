@@ -1,0 +1,37 @@
+#I tried another interesting method to build image and run files named it as Dockerfile1
+#Reference article- https://www.ankursheel.com/blog/run-sql-server-docker-container
+
+FROM ubuntu:latest
+FROM mcr.microsoft.com/mssql/server:2017-latest
+ARG SA_PASSWORD="Password1!"
+ENV SA_PASSWORD=$SA_PASSWORD
+ENV ACCEPT_EULA="Y"
+
+RUN apt-get update && apt-get install -y mysql-client
+RUN apt-get update && apt-get install -y bash
+
+EXPOSE 1433
+
+RUN mkdir -p /usr/work
+COPY ./hw_02.sql /usr/work/
+
+WORKDIR /usr/work
+
+RUN ( /opt/mssql/bin/sqlservr & ) \
+    | grep -q "Service started" \
+    && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $SA_PASSWORD -i hw_02.sql \
+    && pkill sqlservr
+ 
+RUN mkdir -p /usr/work   
+COPY ./baseball.sql /usr/work/
+
+RUN ( /opt/mssql/bin/sqlservr & ) \
+    | grep -q "Service started" \
+    && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P $SA_PASSWORD -i baseball.sql \
+    && pkill sqlservr
+
+COPY ./please.sh /script/please.sh
+RUN chmod +x /script/please.sh 
+ENTRYPOINT ["/bin/bash"]
+CMD ["./script/please.sh"]
+
