@@ -11,7 +11,7 @@ fi
 
 # Run the SQL query and store the results in a file
 echo "Running SQL query..."
-if ! mysql -u root -proot baseball < ./sql/joshi.sql > ./output/results.txt; then
+if ! mysql -u root -proot baseball < ./sql/joshi.sql > ./output/results.csv; then
     echo "Error: Failed to run SQL query from ./sql/joshi.sql" >&2
     exit 1
 fi
