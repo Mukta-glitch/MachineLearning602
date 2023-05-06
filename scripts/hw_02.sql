@@ -36,8 +36,6 @@ SELECT
     END
   ) AS batting_avg,
   b1.game_id,
-  b1.local_date,
-  DATE_SUB(b1.local_date, INTERVAL 100 DAY) AS ROLLING
 FROM batter_avg_rolling_temp b1
 INNER JOIN batter_avg_rolling_temp b2
 ON b1.batter = b2.batter
