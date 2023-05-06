@@ -5,6 +5,6 @@ services:
         container_name: sql_server_db
         build:
             context: ./../
-            dockerfile: ./build/mssqlserver.Dockerfile
+            dockerfile: ./build/Dockerfile
         ports:
             - '3306:3306'
