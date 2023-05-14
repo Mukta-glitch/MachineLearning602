@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  mariadb:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ROOT_PASSWORD}
+      - MYSQL_DATABASE=mydatabase
+    volumes:
+      - mariadb:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    restart: unless-stopped
+  myapp:
+    build: .
+    volumes:
+      - mariadb:/app/plot
+      - mariadb:/app/res
+    depends_on:
+      - mariadb
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql://root:${ROOT_PASSWORD}@mariadb/mydatabase
+volumes:
+  mariadb:
+    driver: local
